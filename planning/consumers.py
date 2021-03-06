@@ -1,5 +1,7 @@
 import json
 from channels.generic.websocket import AsyncWebsocketConsumer
+from channels.db import database_sync_to_async
+from .models import Votes
 
 
 class PlanningConsumer(AsyncWebsocketConsumer):
@@ -10,6 +12,14 @@ class PlanningConsumer(AsyncWebsocketConsumer):
         await self.channel_layer.group_add(self.topic_group_name, self.channel_name)
 
         await self.accept()
+
+        votes = await self.get_votes()
+        for vote in votes:
+            await self.send(
+                text_data=json.dumps(
+                    {"message": vote.value, "client_id": vote.client_id}
+                )
+            )
 
     async def disconnect(self, _):
         await self.channel_layer.group_discard(self.topic_group_name, self.channel_name)
@@ -28,6 +38,30 @@ class PlanningConsumer(AsyncWebsocketConsumer):
         message = event["message"]
         client_id = event["client_id"]
 
+        if message == "RESET":
+            await self.clear_votes()
+        else:
+            await self.save_vote(client_id, message)
+
         await self.send(
             text_data=json.dumps({"message": message, "client_id": client_id})
         )
+
+    @database_sync_to_async
+    def clear_votes(self):
+        return Votes.objects.filter(session_id=self.topic_name).delete()
+
+    @database_sync_to_async
+    def save_vote(self, client_id, message):
+        vote, created = Votes.objects.get_or_create(
+            session_id=self.topic_name,
+            defaults=dict(client_id=client_id, value=message),
+        )
+        if not created:
+            vote.value = message
+            vote.save()
+        return vote
+
+    @database_sync_to_async
+    def get_votes(self):
+        return list(Votes.objects.filter(session_id=self.topic_name))
