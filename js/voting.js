@@ -30,6 +30,7 @@ export function render(parent, currentTopic, createNewSession) {
     const msg = JSON.parse(data);
     if (msg.message === "RESET") {
       registeredVotes = {};
+      renderVoteSelector(voteContainer);
     } else {
       registeredVotes[msg.client_id] = msg.message;
     }
@@ -44,6 +45,7 @@ export function render(parent, currentTopic, createNewSession) {
 }
 
 function renderVoteSelector(parent) {
+  clearElement(parent);
   SELECTABLE_POINTS.forEach((v) => {
     createElement("input", parent, {
       type: "radio",
