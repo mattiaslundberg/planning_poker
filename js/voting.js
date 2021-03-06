@@ -10,16 +10,10 @@ export function render(parent, currentTopic, createNewSession) {
 
   const socket = setup(currentTopic);
 
-  const copyLink = createElement("button", parent, {
-    text: "Copy session link",
+  const buttonContainer = createElement("div", parent, {
+    class: "button-container",
   });
-  copyLink.addEventListener("click", () => console.log("FIXME"));
-
-  const reset = createElement("button", parent, { text: "Clear votes" });
-  reset.addEventListener("click", () => send(socket, "RESET"));
-
-  const newSession = createElement("button", parent, { text: "New session" });
-  newSession.addEventListener("click", () => createNewSession());
+  renderButtons(buttonContainer, socket, createNewSession);
 
   const container = createElement("div", parent, { class: "voting-container" });
   const voteContainer = createElement("form", container, {
@@ -72,4 +66,19 @@ function renderVotes(parent) {
   Object.keys(registeredVotes).forEach((k) => {
     createElement("div", parent, { text: registeredVotes[k], class: "vote" });
   });
+}
+
+function renderButtons(parent, socket, createNewSession) {
+  const copyLink = createElement("button", parent, {
+    text: "Copy link",
+  });
+  copyLink.addEventListener("click", () =>
+    navigator.clipboard.writeText(document.location.href)
+  );
+
+  const reset = createElement("button", parent, { text: "Clear votes" });
+  reset.addEventListener("click", () => send(socket, "RESET"));
+
+  const newSession = createElement("button", parent, { text: "New session" });
+  newSession.addEventListener("click", () => createNewSession());
 }
