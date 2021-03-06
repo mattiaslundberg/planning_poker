@@ -1,18 +1,24 @@
 import { render as lobby } from "./lobby";
+import { render as voting } from "./voting";
 import { clearElement } from "./dom_helpers";
 
 const root = document.getElementById("root");
-let currentTopic = document.location.hash.replace("#", "");
+let initialTopic = document.location.hash.replace("#", "");
 
-if (!currentTopic) {
-  clearElement(root);
-  lobby(root, openTopic);
+if (!initialTopic) {
+  openLobby();
 } else {
-  openTopic(currentTopic);
+  openTopic(initialTopic);
 }
 
 function openTopic(topicName) {
   clearElement(root);
   document.location.hash = topicName;
-  console.warn(`Open topic ${topicName}`);
+  voting(root, topicName, openLobby);
+}
+
+function openLobby() {
+  clearElement(root);
+  document.location.hash = "";
+  lobby(root, openTopic);
 }
