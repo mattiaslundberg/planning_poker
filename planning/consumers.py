@@ -17,12 +17,17 @@ class PlanningConsumer(AsyncWebsocketConsumer):
     async def receive(self, text_data):
         text_data_json = json.loads(text_data)
         message = text_data_json["message"]
+        client_id = text_data_json["client_id"]
 
         await self.channel_layer.group_send(
-            self.topic_group_name, {"type": "vote_message", "message": message}
+            self.topic_group_name,
+            {"type": "vote_message", "message": message, "client_id": client_id},
         )
 
     async def vote_message(self, event):
         message = event["message"]
+        client_id = event["client_id"]
 
-        await self.send(text_data=json.dumps({"message": message}))
+        await self.send(
+            text_data=json.dumps({"message": message, "client_id": client_id})
+        )
