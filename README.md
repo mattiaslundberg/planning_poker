@@ -16,9 +16,7 @@ Recommended installation with pyenv:
 2. Install [pyenv-virtualenv](https://github.com/pyenv/pyenv-virtualenv#installation)
 3. Create new virtualenv with pyenv-virtualenv `pyenv virtualenv 3.9.2 planning_poker`
 4. Activate the virtualenv when in the project folder `pyenv local planning_poker`
-5. Install dependencies `pip install -r requirements.txt`
-6. Run server `./manage.py runserver`
-7. Run tests using `./manage.py test`
+5. Follow common instructions below
 
 Installation with homebrew python (assuming MacOS and Posix-compatible shell such as bash or zsh):
 
@@ -26,9 +24,16 @@ Installation with homebrew python (assuming MacOS and Posix-compatible shell suc
 2. Install python `brew install python@3.9`
 3. Create virtualenv `python -m venv venv`
 4. Activate virtualenv `. venv/bin/activate`
+5. Follow common instructions below
+
+Common instructions
+
+1. Install [homebrew](https://brew.sh)
+2. Install [redis](https://redis.io): `brew install redis`
+3. Start redis `redis-server` or `brew services start redis`
 5. Install dependencies `pip install -r requirements.txt`
-6. Run server `./manage.py runserver`
-7. Run tests using `./manage.py test`
+5. Run server `./manage.py runserver`
+6. Run tests using `./manage.py test`
 
 ## Getting started (frontend)
 
