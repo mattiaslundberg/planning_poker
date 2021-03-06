@@ -31,7 +31,7 @@ Common instructions
 1. Install [homebrew](https://brew.sh)
 2. Install [redis](https://redis.io): `brew install redis`
 3. Start redis `redis-server` or `brew services start redis`
-5. Install dependencies `pip install -r requirements.txt`
+4. Install dependencies `pip install -r requirements.txt`
 5. Run server `./manage.py runserver`
 6. Run tests using `./manage.py test`
 
