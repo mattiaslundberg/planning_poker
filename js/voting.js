@@ -5,7 +5,7 @@ const SELECTABLE_POINTS = ["0", "1/2", "1", "2", "3", "5", "8", "13"];
 
 let registeredVotes = {};
 
-export function render(parent, currentTopic, onReset) {
+export function render(parent, currentTopic, createNewSession) {
   createElement("h1", parent, { text: `Planning poker: ${currentTopic}` });
 
   const socket = setup(currentTopic);
@@ -28,14 +28,18 @@ export function render(parent, currentTopic, onReset) {
 
   socket.onmessage = ({ data }) => {
     const msg = JSON.parse(data);
-    registeredVotes[msg.client_id] = msg.message;
-    renderVotes(voteDisplay);
+    if (msg.message === "RESET") {
+      registeredVotes = {};
+    } else {
+      registeredVotes[msg.client_id] = msg.message;
+    }
+    renderVotes(voteDisplay, socket);
   };
-  renderVotes(voteDisplay);
+  renderVotes(voteDisplay, socket);
 
-  const button = createElement("button", parent, { text: "Reset" });
+  const button = createElement("button", parent, { text: "New session" });
   button.addEventListener("click", () => {
-    onReset();
+    createNewSession();
   });
 }
 
@@ -50,10 +54,15 @@ function renderVoteSelector(parent) {
   });
 }
 
-function renderVotes(parent) {
+function renderVotes(parent, socket) {
   clearElement(parent);
   createElement("div", parent, { text: "Votes" });
   Object.keys(registeredVotes).forEach((k) => {
     createElement("div", parent, { text: registeredVotes[k], class: "vote" });
+  });
+
+  const button = createElement("button", parent, { text: "Clear votes" });
+  button.addEventListener("click", () => {
+    send(socket, "RESET");
   });
 }
