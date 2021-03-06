@@ -1,0 +1,11 @@
+.voting-container {
+  display: flex;
+}
+
+.voting-results {
+  flex-grow: 1;
+}
+
+.voting-selector {
+  flex-grow: 1;
+}
