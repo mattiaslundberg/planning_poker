@@ -12,7 +12,7 @@ class PlanningConsumer(AsyncWebsocketConsumer):
         await self.accept()
 
     async def disconnect(self, _):
-        await self.channel_layer.group_discard(self.room_topic_name, self.channel_name)
+        await self.channel_layer.group_discard(self.topic_group_name, self.channel_name)
 
     async def receive(self, text_data):
         text_data_json = json.loads(text_data)
