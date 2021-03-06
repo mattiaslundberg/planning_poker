@@ -4,6 +4,7 @@ import { setup, send } from "./socket";
 const SELECTABLE_POINTS = ["0", "1/2", "1", "2", "3", "5", "8", "13"];
 
 let registeredVotes = {};
+let selfSelected;
 
 export function render(parent, currentTopic, createNewSession) {
   createElement("h1", parent, { text: "Planning poker" });
@@ -19,52 +20,52 @@ export function render(parent, currentTopic, createNewSession) {
   const voteContainer = createElement("form", container, {
     class: "voting-selector",
   });
-  renderVoteSelector(voteContainer);
+  const resultContainer = createElement("form", container, {
+    class: "voting-results",
+  });
+  renderVoteSelector(voteContainer, resultContainer);
   voteContainer.addEventListener("change", () => {
     const selected = document.querySelector('input[name="points"]:checked');
     if (selected) {
       send(socket, selected.value);
+      selfSelected = selected.value;
     }
-  });
-
-  const voteDisplay = createElement("div", container, {
-    class: "voting-results",
   });
 
   socket.onmessage = ({ data }) => {
     const msg = JSON.parse(data);
     if (msg.message === "RESET") {
       registeredVotes = {};
-      renderVoteSelector(voteContainer);
     } else {
       registeredVotes[msg.client_id] = msg.message;
     }
-    renderVotes(voteDisplay);
+    renderVoteSelector(voteContainer, resultContainer);
   };
-  renderVotes(voteDisplay);
 }
 
-function renderVoteSelector(parent) {
-  clearElement(parent);
+function renderVoteSelector(selectorParent, resultParent) {
+  const voteCounts = getVoteCounts();
+  clearElement(selectorParent);
+  clearElement(resultParent);
+
   SELECTABLE_POINTS.forEach((v) => {
-    createElement("input", parent, {
+    const input = createElement("input", selectorParent, {
       type: "radio",
       id: `vote-${v}`,
       name: "points",
       value: v,
     });
-    createElement("label", parent, {
+    if (v === selfSelected) {
+      input.checked = true;
+    }
+    createElement("label", selectorParent, {
       for: `vote-${v}`,
       text: v,
     });
-  });
-}
 
-function renderVotes(parent) {
-  clearElement(parent);
-  createElement("div", parent, { text: "Votes" });
-  Object.keys(registeredVotes).forEach((k) => {
-    createElement("div", parent, { text: registeredVotes[k], class: "vote" });
+    createElement("div", resultParent, {
+      text: voteCounts[v] || "0",
+    });
   });
 }
 
@@ -81,4 +82,16 @@ function renderButtons(parent, socket, createNewSession) {
 
   const newSession = createElement("button", parent, { text: "New session" });
   newSession.addEventListener("click", () => createNewSession());
+}
+
+function getVoteCounts() {
+  return Object.keys(registeredVotes).reduce((acc, k) => {
+    const value = registeredVotes[k];
+    if (acc[value]) {
+      acc[value] += 1;
+    } else {
+      acc[value] = 1;
+    }
+    return acc;
+  }, {});
 }
