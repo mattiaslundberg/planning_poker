@@ -55,7 +55,8 @@ class PlanningConsumer(AsyncWebsocketConsumer):
     def save_vote(self, client_id, message):
         vote, created = Votes.objects.get_or_create(
             session_id=self.topic_name,
-            defaults=dict(client_id=client_id, value=message),
+            client_id=client_id,
+            defaults=dict(value=message),
         )
         if not created:
             vote.value = message
