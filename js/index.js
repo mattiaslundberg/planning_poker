@@ -1,28 +1,18 @@
-const chatSocket = new WebSocket("ws://localhost:8000/ws/planning/first/");
+import { render as lobby } from "./lobby";
+import { clearElement } from "./dom_helpers";
 
-chatSocket.onmessage = function (e) {
-  console.info(e);
-};
+const root = document.getElementById("root");
+let currentTopic = document.location.hash.replace("#", "");
 
-chatSocket.onclose = function (e) {
-  console.error("Chat socket closed unexpectedly");
-};
+if (!currentTopic) {
+  clearElement(root);
+  lobby(root, openTopic);
+} else {
+  openTopic(currentTopic);
+}
 
-document.querySelector("#chat-message-input").focus();
-document.querySelector("#chat-message-input").onkeyup = function (e) {
-  if (e.keyCode === 13) {
-    // enter, return
-    document.querySelector("#chat-message-submit").click();
-  }
-};
-
-document.querySelector("#chat-message-submit").onclick = function (e) {
-  const messageInputDom = document.querySelector("#chat-message-input");
-  const message = messageInputDom.value;
-  chatSocket.send(
-    JSON.stringify({
-      message: message,
-    })
-  );
-  messageInputDom.value = "";
-};
+function openTopic(topicName) {
+  clearElement(root);
+  document.location.hash = topicName;
+  console.warn(`Open topic ${topicName}`);
+}
