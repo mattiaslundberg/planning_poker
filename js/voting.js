@@ -12,7 +12,7 @@ export function render(parent, currentTopic, onReset) {
   });
 
   const voteContainer = createElement("form", parent, {});
-  renderVote(voteContainer);
+  renderVoteSelector(voteContainer);
   voteContainer.addEventListener("change", () => {
     const selected = document.querySelector('input[name="points"]:checked');
     if (selected) {
@@ -26,7 +26,7 @@ export function render(parent, currentTopic, onReset) {
   });
 }
 
-function renderVote(parent) {
+function renderVoteSelector(parent) {
   SELECTABLE_POINTS.forEach((v) => {
     createElement("input", parent, {
       type: "radio",
