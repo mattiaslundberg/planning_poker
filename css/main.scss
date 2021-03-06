@@ -1,0 +1,30 @@
+body {
+  font-size: 2em;
+  font-family: sans-serif;
+}
+.voting-container {
+  display: flex;
+}
+
+.voting-results {
+  flex-grow: 1;
+}
+
+.voting-selector {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+
+  input {
+    display: none;
+  }
+
+  label {
+    width: 20%;
+    text-align: center;
+  }
+
+  input[type="radio"]:checked + label {
+    background-color: lightgreen;
+  }
+}

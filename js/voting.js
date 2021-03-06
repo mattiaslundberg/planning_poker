@@ -6,9 +6,20 @@ const SELECTABLE_POINTS = ["0", "1/2", "1", "2", "3", "5", "8", "13"];
 let registeredVotes = {};
 
 export function render(parent, currentTopic, createNewSession) {
-  createElement("h1", parent, { text: `Planning poker: ${currentTopic}` });
+  createElement("h1", parent, { text: "Planning poker" });
 
   const socket = setup(currentTopic);
+
+  const copyLink = createElement("button", parent, {
+    text: "Copy session link",
+  });
+  copyLink.addEventListener("click", () => console.log("FIXME"));
+
+  const reset = createElement("button", parent, { text: "Clear votes" });
+  reset.addEventListener("click", () => send(socket, "RESET"));
+
+  const newSession = createElement("button", parent, { text: "New session" });
+  newSession.addEventListener("click", () => createNewSession());
 
   const container = createElement("div", parent, { class: "voting-container" });
   const voteContainer = createElement("form", container, {
@@ -34,14 +45,9 @@ export function render(parent, currentTopic, createNewSession) {
     } else {
       registeredVotes[msg.client_id] = msg.message;
     }
-    renderVotes(voteDisplay, socket);
+    renderVotes(voteDisplay);
   };
-  renderVotes(voteDisplay, socket);
-
-  const button = createElement("button", parent, { text: "New session" });
-  button.addEventListener("click", () => {
-    createNewSession();
-  });
+  renderVotes(voteDisplay);
 }
 
 function renderVoteSelector(parent) {
@@ -49,22 +55,21 @@ function renderVoteSelector(parent) {
   SELECTABLE_POINTS.forEach((v) => {
     createElement("input", parent, {
       type: "radio",
+      id: `vote-${v}`,
       name: "points",
       value: v,
+    });
+    createElement("label", parent, {
+      for: `vote-${v}`,
       text: v,
     });
   });
 }
 
-function renderVotes(parent, socket) {
+function renderVotes(parent) {
   clearElement(parent);
   createElement("div", parent, { text: "Votes" });
   Object.keys(registeredVotes).forEach((k) => {
     createElement("div", parent, { text: registeredVotes[k], class: "vote" });
-  });
-
-  const button = createElement("button", parent, { text: "Clear votes" });
-  button.addEventListener("click", () => {
-    send(socket, "RESET");
   });
 }
